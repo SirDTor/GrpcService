@@ -26,7 +26,7 @@ namespace GrpcService.Core.Services
             {
                 await responseStream.WriteAsync(new HelloReply()
                 {
-                    Message = "Hello" + request.Name + " " + DateTime.UtcNow
+                    Message = "Hello " + request.Name + " " + DateTime.UtcNow
                 });
             }
         }
