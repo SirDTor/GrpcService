@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Protobuf Include="Protos\greet.proto" GrpcServices="Client" />
+		<Protobuf Include="..\GrpcService.Protocol\greet.proto" GrpcServices="Client" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -18,6 +18,10 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>		
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\GrpcService.Protocol\GrpcService.Protocol.csproj" />
 	</ItemGroup>
 	
 </Project>

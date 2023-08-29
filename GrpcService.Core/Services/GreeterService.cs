@@ -1,31 +1,36 @@
 using Grpc.Core;
-using GrpcService.Core;
+using GrpcService.Protocol;
 
 namespace GrpcService.Core.Services
 {
     public class GreeterService : Greeter.GreeterBase
     {
         private readonly ILogger<GreeterService> _logger;
+
+        private int _number = 1;
+
         public GreeterService(ILogger<GreeterService> logger)
         {
             _logger = logger;
         }
 
-        public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
+        public override Task<MessageReply> SayMessage(MessageRequest request, ServerCallContext context)
         {
-            return Task.FromResult(new HelloReply
+            return Task.FromResult(new MessageReply
             {
-                Message = "Hello " + request.Name
+                Message = "Hello " + request.Name                
             });
         }
 
-        public override async Task SayHelloStream(IAsyncStreamReader<HelloRequest> requestStream,
-            IServerStreamWriter<HelloReply> responseStream, ServerCallContext context)
+        public override async Task SayMessageStream(IAsyncStreamReader<MessageRequest> requestStream,
+            IServerStreamWriter<MessageReply> responseStream, ServerCallContext context)
         {
             await foreach (var request in requestStream.ReadAllAsync())
             {
-                await responseStream.WriteAsync(new HelloReply()
+                _number++;
+                await responseStream.WriteAsync(new MessageReply()
                 {
+                    Num = _number,
                     Message = "Hello " + request.Name + " " + DateTime.UtcNow
                 });
             }

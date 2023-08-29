@@ -2,41 +2,46 @@
 using Grpc.Core;
 using Grpc.Net.Client;
 using GrpcService.Client;
+using GrpcService.Protocol;
 
 namespace GrpcService.Client
 {
     class Program
     {
         static async Task Main(string[] args)
-        {
-
-            // The port number must match the port of the gRPC server.
-            using var channel = GrpcChannel.ForAddress("https://localhost:7191");
-            var client = new Greeter.GreeterClient(channel);
-
-            using var call = client.SayHelloStream();
-
-            var readTask = Task.Run(async () =>
+        {            
+            Console.WriteLine("Введите порт сервера:");
+            string? port = Console.ReadLine();
+            if (port != null)
             {
-                await foreach (var response in call.ResponseStream.ReadAllAsync())
-                {
-                    Console.WriteLine(response.Message);
-                }
-            });
+                // The port number must match the port of the gRPC server.
+                using var channel = GrpcChannel.ForAddress($"https://localhost:{port}");
+                var client = new Greeter.GreeterClient(channel);
 
-            while(true)
-            {
-                var result = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(result)) 
+                using var call = client.SayMessageStream();
+
+                var readTask = Task.Run(async () =>
                 {
-                    break;
+                    await foreach (var response in call.ResponseStream.ReadAllAsync())
+                    {
+                        Console.Write(response.Num + " ");
+                        Console.WriteLine(response.Message);
+                    }
+                });
+
+                while (true)
+                {
+                    var result = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(result))
+                    {
+                        break;
+                    }
+                    await call.RequestStream.WriteAsync(new MessageRequest() { Name = result });
                 }
-                await call.RequestStream.WriteAsync(new HelloRequest() { Name = result });
+
+                await call.RequestStream.CompleteAsync();
+                await readTask;
             }
-
-            await call.RequestStream.CompleteAsync();
-            await readTask;
-
             //var reply = await client.SayHelloAsync(
             //                  new HelloRequest { Name = Console.ReadLine() });
 

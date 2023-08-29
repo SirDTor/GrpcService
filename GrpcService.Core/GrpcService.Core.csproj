@@ -6,15 +6,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>8faab4fa-85e1-42c4-805f-20fabd49362f</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <SignAssembly>False</SignAssembly>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GrpcService.Protocol\GrpcService.Protocol.csproj" />
   </ItemGroup>
 
 </Project>
