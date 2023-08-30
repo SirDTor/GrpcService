@@ -2,13 +2,16 @@ syntax = "proto3";
 
 option csharp_namespace = "GrpcService.Protocol";
 
-package greet;
+package AuthApi;
 
 // The greeting service definition.
 service Greeter {
   // Sends a greeting
   rpc SayMessage (MessageRequest) returns (MessageReply);
   rpc SayMessageStream ( stream MessageRequest) returns (stream MessageReply);
+}
+service Auth {
+  rpc Authentication(AuthRequest) returns (AuthReply);
 }
 
 // The request message containing the user's name.
@@ -20,6 +23,17 @@ message MessageRequest {
 message MessageReply {
   int32 num = 1;
   string message = 2;
+}
+
+message AuthRequest{
+	string login = 1;
+	string password = 2;
+}
+
+message AuthReply{
+	string login = 1;
+	string message = 2;
+	bool is_true = 3;
 }
 
 

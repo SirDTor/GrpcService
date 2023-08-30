@@ -21,5 +21,13 @@ namespace GrpcService.Core.Interceptors
 
             _logger.Log(LogLevel.Information, message: $"End - {context.Method}");
         }
+
+        public override Task<TResponse> UnaryServerHandler<TRequest, TResponse>(TRequest request, ServerCallContext context, 
+            UnaryServerMethod<TRequest, TResponse> continuation)
+        {
+            _logger.Log(LogLevel.Critical, message: $"Connected client with rights: {context.ResponseTrailers}");
+
+            return base.UnaryServerHandler(request, context, continuation);
+        }
     }
 }

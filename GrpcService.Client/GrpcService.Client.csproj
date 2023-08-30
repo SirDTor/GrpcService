@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Protobuf Include="..\GrpcService.Protocol\greet.proto" GrpcServices="Client" />
+		<Protobuf Include="..\GrpcService.Protocol\AuthApi.proto" GrpcServices="Client" />
 	</ItemGroup>
 
 	<ItemGroup>

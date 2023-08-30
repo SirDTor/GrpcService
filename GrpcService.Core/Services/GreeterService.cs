@@ -6,8 +6,7 @@ namespace GrpcService.Core.Services
     public class GreeterService : Greeter.GreeterBase
     {
         private readonly ILogger<GreeterService> _logger;
-
-        private int _number = 1;
+        private int _number = 0;
 
         public GreeterService(ILogger<GreeterService> logger)
         {
@@ -27,12 +26,13 @@ namespace GrpcService.Core.Services
         {
             await foreach (var request in requestStream.ReadAllAsync())
             {
+                Console.WriteLine("Accepted message");
                 _number++;
                 await responseStream.WriteAsync(new MessageReply()
                 {
                     Num = _number,
-                    Message = "Hello " + request.Name + " " + DateTime.UtcNow
-                });
+                    Message = "Accepted " + request.Name + " " + DateTime.UtcNow
+                });                
             }
         }
     }
