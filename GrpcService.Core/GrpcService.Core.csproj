@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Исходники\Opc.Ua\Opc.Ua.csproj" />
     <ProjectReference Include="..\GrpcService.Protocol\GrpcService.Protocol.csproj" />
   </ItemGroup>
 

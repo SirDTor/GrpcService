@@ -25,7 +25,7 @@ namespace GrpcService.Core.Interceptors
         public override Task<TResponse> UnaryServerHandler<TRequest, TResponse>(TRequest request, ServerCallContext context, 
             UnaryServerMethod<TRequest, TResponse> continuation)
         {
-            _logger.Log(LogLevel.Critical, message: $"Connected client with rights: {context.ResponseTrailers}");
+            _logger.Log(LogLevel.Critical, message: $"Connected client with rights: admin");
 
             return base.UnaryServerHandler(request, context, continuation);
         }

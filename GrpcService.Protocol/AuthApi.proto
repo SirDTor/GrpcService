@@ -14,6 +14,13 @@ service Auth {
   rpc Authentication(AuthRequest) returns (AuthReply);
 }
 
+service GetNode{
+	rpc ConnectToOPCServer(NodeRequest) returns (ConnectReply);
+	rpc GetNodeInformation(NodeRequest) returns (NodeReply);
+	rpc GetNodeInformationClientStream(stream NodeRequest) returns (stream NodeReply);
+	rpc GetNodeInformationServerStream(NodeRequest) returns (stream NodeReply);
+}
+
 // The request message containing the user's name.
 message MessageRequest {
   string name = 2;
@@ -36,4 +43,14 @@ message AuthReply{
 	bool is_true = 3;
 }
 
+message NodeRequest{}
+
+message ConnectReply{
+	bool is_connect = 1;
+}
+
+message NodeReply{
+	string node_name = 1;
+	bool node_value = 2;
+}
 

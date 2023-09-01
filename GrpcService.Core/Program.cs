@@ -15,12 +15,11 @@ builder.Services.AddGrpc(configureOptions:options =>
 {
     options.Interceptors.Add(typeof(LoggingInterceptor), logger);
 });
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.MapGrpcService<GetNodeInformationService>();
 app.MapGrpcService<LoginService>();
 app.MapGrpcService<GreeterService>();
 app.MapGet("/", () => "Test login service");
-
 app.Run();
