@@ -11,7 +11,6 @@ using Opc.Ua.ViewModels;
 using System;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.Collections.Generic;
-using GrpcService.Core.NodeInfo;
 using Microsoft.AspNetCore.Server.IIS.Core;
 using Google.Protobuf;
 
@@ -19,6 +18,15 @@ namespace GrpcService.Core.Services
 {
     public class GetNodeInformationService : GetNode.GetNodeBase
     {
+        public string serverUrl = "opc.tcp://10.13.33.1:62450";
+        public IUserIdentity userAuthentication = new IUserIdentity();
+        public SecurityPolicy securityPolicy = new SecurityPolicy();
+        public string? certificateStorePath = @"E:\projects\POWERSIBERIA\Logs";
+        public string applicationName = "TestServer";
+        public Guid _uidConection;
+        public AttributeId _attributeId;
+        public Guid UidConection { get => _uidConection; set => _uidConection = value; }
+        public AttributeId AttributeId { get => _attributeId; set => _attributeId = value; }        
         private Opc.Ua.InputModels.Node[] nodes =
             {
                 new Opc.Ua.InputModels.Node("Modbus.TC.TS1", 1),
@@ -36,36 +44,26 @@ namespace GrpcService.Core.Services
                 new Opc.Ua.InputModels.Node("Modbus.TC.TS13", 1),
                 new Opc.Ua.InputModels.Node("Modbus.TC.TS14", 1)
             };
-        private OpcUaConnectionFactory _connectionFactory = new OpcUaConnectionFactory();
         private List<OpcData> list = new List<OpcData>();
+        private OpcUaConnectionFactory opcConnection;
 
-        public OpcUaConnectionFactory ConnectionFactory { get => _connectionFactory; set => _connectionFactory = value; }
-
-        public override async Task<ConnectReply> ConnectToOPCServer(NodeRequest request, ServerCallContext context)
+        public ConnectionInputModel ConnectToServerAsync()
         {
-            try
-            {
-                ConnectionFactory = await ServerConnection.ConnectToServerAsync();
-                return await Task.FromResult(new ConnectReply
-                {
-                    IsConnect = true
-                });
-            }
-            catch (ArgumentException)
-            {
-                return await Task.FromResult(new ConnectReply
-                {
-                    IsConnect = false
-                });
-            }
+            opcConnection = new OpcUaConnectionFactory();
+            var model = new ConnectionInputModel(serverUrl, userAuthentication,
+                securityPolicy, certificateStorePath, applicationName);
+            return model;
         }
 
         public override async Task<NodeReply> GetNodeInformation(NodeRequest request, ServerCallContext context)
         {
-            ConnectionFactory = await ServerConnection.ConnectToServerAsync();
-            var opcReader = new OpcUaReader(ConnectionFactory);
+            var model = ConnectToServerAsync();
+            UidConection = await opcConnection.CreateUaChannel(model);
+            AttributeId = AttributeId.Value;
+            var integrityServerDataReader = new OpcUaReader(opcConnection);
+            //ConnectionFactory = await ServerConnection.ConnectToServerAsync();
             Console.WriteLine($"Read {nodes.Length} tags by OPC UA ");
-            list = await opcReader.Read(ServerConnection.UidConection, ServerConnection.AttributeId, new Opc.Ua.InputModels.Node("Modbus.TC.TS1", 1));
+            list = await integrityServerDataReader.Read(UidConection, AttributeId, new Opc.Ua.InputModels.Node("Modbus.TC.TS1", 1));
             return await Task.FromResult(new NodeReply
             {
                 NodeName = nodes[0].Identifier,
@@ -85,9 +83,10 @@ namespace GrpcService.Core.Services
         public override async Task GetNodeInformationClientStream(IAsyncStreamReader<NodeRequest> requestStream,
             IServerStreamWriter<NodeReply> responseStream, ServerCallContext context)
         {
-            ConnectionFactory = await ServerConnection.ConnectToServerAsync();
-            var opcReader = new OpcUaReader(ConnectionFactory);
-
+            var model = ConnectToServerAsync();
+            UidConection = await opcConnection.CreateUaChannel(model);
+            //ConnectToServerAsync();
+            var integrityServerDataReader = new OpcUaReader(opcConnection);
             var readTask = Task.Run(async () =>
             {
                 await foreach (NodeRequest node in requestStream.ReadAllAsync())
@@ -96,7 +95,7 @@ namespace GrpcService.Core.Services
                 }
             });
             int i = 0;
-            list = await opcReader.Read(ServerConnection.UidConection, ServerConnection.AttributeId, nodes);
+            list = await integrityServerDataReader.Read(UidConection, AttributeId, nodes);
             await foreach (var node in GetNumbersAsync())
             {
                 // Посылаем ответ, пока клиент не закроет поток
@@ -112,13 +111,14 @@ namespace GrpcService.Core.Services
 
         public override async Task GetNodeInformationServerStream(NodeRequest request, IServerStreamWriter<NodeReply> responseStream, ServerCallContext context)
         {
-            ConnectionFactory = await ServerConnection.ConnectToServerAsync();
-            var opcReader = new OpcUaReader(ConnectionFactory);
+            var model = ConnectToServerAsync();
+            UidConection = await opcConnection.CreateUaChannel(model);
+            var integrityServerDataReader = new OpcUaReader(opcConnection);
             while (true)
             {
-                await Task.Delay(300);
                 int i = 0;
-                list = await opcReader.Read(ServerConnection.UidConection, ServerConnection.AttributeId, nodes);
+                //await Task.Delay(1000);
+                list = await integrityServerDataReader.Read(UidConection, AttributeId, nodes);
                 await foreach (var node in GetNumbersAsync())
                 {
                     // Посылаем ответ, пока клиент не закроет поток

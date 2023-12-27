@@ -15,8 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Исходники\Opc.Ua\Opc.Ua.csproj" />
+    <ProjectReference Include="..\opc.ua\Opc.Ua\Opc.Ua.csproj" />
     <ProjectReference Include="..\GrpcService.Protocol\GrpcService.Protocol.csproj" />
+    <ProjectReference Include="..\opc.ua\Opc.Ua\Opc.Ua.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="NodeInfo\" />
   </ItemGroup>
 
 </Project>
