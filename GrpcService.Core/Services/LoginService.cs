@@ -14,7 +14,7 @@ namespace GrpcService.Core.Services
                 return Task.FromResult(new AuthReply
                 {
                     Message = "Неверный логин или пароль",
-                    IsTrue = false
+                    IsTrue = true
                 });
             }
             else return Task.FromResult(new AuthReply

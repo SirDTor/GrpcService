@@ -15,7 +15,6 @@ service Auth {
 }
 
 service GetNode{
-	rpc ConnectToOPCServer(NodeRequest) returns (ConnectReply);
 	rpc GetNodeInformation(NodeRequest) returns (NodeReply);
 	rpc GetNodeInformationClientStream(stream NodeRequest) returns (stream NodeReply);
 	rpc GetNodeInformationServerStream(NodeRequest) returns (stream NodeReply);

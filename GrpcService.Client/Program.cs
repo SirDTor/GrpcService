@@ -56,22 +56,20 @@ namespace GrpcService.Client
                 }
 
                 var connectOPCUA = new GetNode.GetNodeClient(channel);
-                var callConnect = await connectOPCUA.ConnectToOPCServerAsync(new NodeRequest());
-                Console.WriteLine(callConnect.IsConnect.ToString());
-
                 var getNodeInfo = connectOPCUA.GetNodeInformation(new NodeRequest());
                 Console.WriteLine($"{getNodeInfo.NodeName} : {getNodeInfo.NodeValue}");
-
                 var getNodeInfoStream = connectOPCUA.GetNodeInformationClientStream();
-
                 var readNodeTask = Task.Run(async () =>
                 {
                     await foreach (var response in getNodeInfoStream.ResponseStream.ReadAllAsync())
                     {
                         Console.WriteLine($"{login}: Node : {response.NodeName} Value : {response.NodeValue}");
                     }
+                    
                 });
+                await getNodeInfoStream.RequestStream.CompleteAsync();
                 await readNodeTask;
+
                 await Task.Delay(5000);
                 ConsoleKeyInfo cki = new ConsoleKeyInfo();
                 var GetNodeValueStream = connectOPCUA.GetNodeInformationServerStream(new NodeRequest());
@@ -89,6 +87,7 @@ namespace GrpcService.Client
                     if (response.NodeName.Contains("14"))
                     {
                         Console.WriteLine("________________________________");
+                        Console.Clear();
                     }
                 }
 
@@ -133,12 +132,6 @@ namespace GrpcService.Client
                 await call.RequestStream.CompleteAsync();
                 await readTask;
             }
-            //var reply = await client.SayHelloAsync(
-            //                  new HelloRequest { Name = Console.ReadLine() });
-
-            // Console.WriteLine("Greeting: " + reply.Message);
-
-            //Console.ReadKey();
         }
     }
 }
